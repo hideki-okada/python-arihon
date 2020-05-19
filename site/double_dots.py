@@ -1,41 +1,21 @@
 from collections import deque
 
-import numpy as np
-
 N, M = list(map(int, input().split()))
-tsuro = [list(map(int, input().split())) for _ in range(M)]
-tsuro = np.array(tsuro)
-arr = list(range(2, N + 1))
-tsuro = np.sort(tsuro, axis=1)
-order = np.argsort(tsuro[:, 0])
-tsuro = tsuro[order]
-print(tsuro)
-depth_array = np.ones(N) * -1
-depth_array[0] = 0
-ans_array = np.zeros(N)
-tsuro_queue = deque(tsuro.tolist())
-counts = 0
-while tsuro:
-    if counts > 2 * N:
-        break
-    room_a, room_b = tsuro.popleft()
-    room_a, room_b = room_a - 1, room_b - 1
-    if depth_array[room_a] != -1 and depth_array[room_b] != -1:
-        continue
-    elif depth_array[room_a] != -1:
-        depth_array[room_b] = depth_array[room_a] + 1
-        ans_array[room_b] = room_a + 1
-        tsuro.append()
-    elif depth_array[room_b] != -1:
-        depth_array[room_a] = depth_array[room_b] + 1
-        ans_array[room_a] = room_b + 1
-    else:
-        tsuro.append([room_a + 1, room_b + 1])
-    counts += 1
-print(depth_array[depth_array != -1])
-if -1 not in depth_array:
-    print('Yes')
-    for ans in ans_array[1:]:
-        print(int(ans))
-else:
-    print('No')
+relation_list = [[] for _ in range(N + 1)]
+for i in range(M):
+    a, b = list(map(int, input().split()))
+    relation_list[a].append(b)
+    relation_list[b].append(a)
+
+room_q = deque()
+room_q.append(1)
+michihsirube_room = [-1 for _ in range(N + 1)]
+while room_q:
+    node = room_q.popleft()
+    for near_room_id in relation_list[node]:
+        if michihsirube_room[near_room_id] == -1:
+            michihsirube_room[near_room_id] = node
+            room_q.append(near_room_id)
+print('Yes')
+for i in range(2, N + 1):
+    print(michihsirube_room[i])
